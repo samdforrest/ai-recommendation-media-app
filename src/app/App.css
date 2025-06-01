@@ -1,0 +1,217 @@
+/* === Font Setup === */
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  color: #111;
+}
+
+/* Main layout container */
+.app-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+}
+
+/* App Header */
+.app-header {
+  margin-bottom: 1rem;
+  text-align: center;
+  border-bottom: 2px solid #ff6d2e;
+  padding-bottom: 1rem;
+  animation: fadeSlideIn 0.6s ease-out forwards;
+}
+
+.app-header h1,
+.app-header h2,
+.app-header .subheading {
+  font-family: 'Rubik', sans-serif;
+}
+
+.app-header h1 {
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.subheading {
+  font-weight: 400;
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+/* Input section - place button next to text area */
+.input-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 2rem;
+  animation: fadeSlideIn 0.6s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+/* Prompt input styles */
+.prompt-input {
+  width: 100%;
+  min-height: 2.25rem;
+  max-height: 10rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  resize: none;
+  overflow-y: auto;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out;
+  line-height: 1.2;
+}
+
+.prompt-input:focus {
+  outline: none;
+  box-shadow: inset 0 0 8px rgba(255, 109, 46, 0.5);
+}
+
+/* Button styles */
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.recommend-button {
+  background-color: #ff6d2e;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+
+.recommend-button:hover {
+  background-color: #e65c1f;
+}
+
+.recommend-button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Results section: flex layout for category blocks */
+.results-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category {
+  flex: 1 1 300px;
+  max-width: 400px;
+  padding: 1.5rem;
+  border: 2px solid rgba(255, 109, 46, 0.3);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(255, 109, 46, 0.1);
+  background-color: rgba(255, 255, 255, 0.3);
+  animation: fadeSlideIn 0.6s ease both;
+}
+
+.category h2 {
+  text-align: center;
+  border-bottom: 2px solid #ff6d2e;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 600;
+}
+
+/* mobile styles */
+@media (max-width: 600px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .subheading {
+    font-size: 1rem;
+  }
+
+  .input-section {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+    animation: fadeSlideIn 0.6s ease-out 0.3s forwards;
+  }
+
+  .prompt-input {
+    width: 100%;
+    min-height: 3.5rem;           /* Taller default height */
+    max-height: 10rem;
+    padding: 0.8rem 1rem;         /* Balanced vertical and horizontal padding */
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    border: none;
+    border-radius: 0.75rem;
+    resize: none;
+    overflow-y: auto;
+    box-sizing: border-box;
+    line-height: 1.5;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out, height 0.2s ease-in-out;
+  }
+
+  .recommend-button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .results-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    animation: fadeSlideIn 0.6s ease-out 0.6s forwards;
+  }
+
+  .category {
+    flex: 1 1 100%;
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+  .category h2 {
+    font-size: 1.2rem;
+  }
+
+  .no-results {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #666;
+  }
+}
+
