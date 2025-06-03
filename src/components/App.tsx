@@ -2,6 +2,7 @@
 
 import './App.css';
 import { useState, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface Recommendation {
   title: string;
@@ -14,6 +15,10 @@ const App = () => {
   const [movies, setMovies] = useState<Recommendation[]>([]);
   const [shows, setShows] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const searchParams = useSearchParams();
+  const userName = searchParams.get('name');
+  const userEmail = searchParams.get('email');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -70,6 +75,13 @@ const App = () => {
 
   return (
     <div className="app-container">
+      {userName && userEmail && (
+        <div className="user-info" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <h2>Welcome, {userName}!</h2>
+          <p style={{ color: '#555' }}>{userEmail}</p>
+        </div>
+      )}
+
       <div className="app-header">
         <h1>AI Media Recommender</h1>
         <h3 className="subheading">Ask for your new selection of Movies and TV!</h3>
