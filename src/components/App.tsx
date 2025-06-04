@@ -75,6 +75,45 @@ const App = () => {
 
   return (
     <div className="app-container">
+      {/* Top bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {userName ? (
+            <>
+              <span>Logged in as {userName}</span>
+              <button
+                onClick={() => window.location.href = '/'}
+                style={{
+                  padding: '0.4rem 0.8rem',
+                  backgroundColor: '#e63946',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => window.location.href = '/login'}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#0070f3',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}
+            >
+              Login
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Welcome message */}
       {userName && userEmail && (
         <div className="user-info" style={{ textAlign: 'center', marginBottom: '1rem' }}>
           <h2>Welcome, {userName}!</h2>
