@@ -1,25 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
 import { Recommendation } from '../../../types';
+//import { prisma } from '@/lib/prisma';
+//import jwt from 'jsonwebtoken';
+
+console.log("GROQ_API_KEY present?", !!process.env.GROQ_API_KEY);
 
 const openai = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
   baseURL: 'https://api.groq.com/openai/v1',
 });
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { prompt } = body;
-
-  if (!prompt) {
-    return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
-  }
-
-  try {
-    const chatResponse = await openai.chat.completions.create({
-      model: 'llama3-8b-8192',
-      messages: [
-        { role: 'system', content: `You are a helpful assistant that recommends movies or shows based on the user's description.
+const systemPrompt = `You are a helpful assistant that recommends movies or shows based on the user's description.
 Always respond with two sections: "Movies" and "TV Series". 
 Each section should be a numbered list in this format:
 1. **Title** (Year): Description
@@ -41,7 +33,40 @@ If it's a TV series that has a singular year / season (e.g. 2008), you should fo
 
 If it's defined as an OVA (Original Video Animation), you should format it as if it was a television show with a single season and year (e.g. 2008-2008).
 
-Another clause for OVAs is that they are usually anime, so whenever anybody asks for an anime, you should consider if the media is an OVA or not.` },
+Another clause for OVAs is that they are usually anime, so whenever anybody asks for an anime, you should consider if the media is an OVA or not.`;
+
+
+export async function POST(req: NextRequest) {
+  /* jwt attempt
+  const token = req.cookies.get('token')?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized - no token' }, { status: 401 });
+  }
+
+  let userId: string;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    userId = decoded.userId;
+  } catch (error) {
+    console.error('Invalid token:', error);
+    return NextResponse.json({ error: 'Unauthorized - invalid token' }, { status: 403 });
+  }
+
+  console.log('User ID:', userId);
+  end of jwt attempt */
+  const body = await req.json();
+  const { prompt } = body;
+
+  if (!prompt) {
+    return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+  }
+
+  try {
+    const chatResponse = await openai.chat.completions.create({
+      model: 'llama3-8b-8192',
+      messages: [
+        { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt },
       ],
     });

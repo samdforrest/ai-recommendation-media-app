@@ -23,6 +23,7 @@ export default function SignupPage() {
     });
 
     const data = await res.json();
+    console.log("Raw response: ", data);
 
     if (res.ok) {
       // ✅ Redirect to login on success

@@ -8,10 +8,30 @@ datasource db {
 }
 
 model User {
-  id           Int    @id @default(autoincrement())
-  name         String
-  email        String @unique
+  id           String   @id @default(uuid())
+  name         String?
+  email        String   @unique
   passwordHash String
+  createdAt    DateTime @default(now())
 
-  @@map("users")
+  context UserContext? // 👈 Back-reference
+}
+
+model UserContext {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  preferredGenres      String[]
+  recentSearches       String[]
+  likedRecommendations String[]
+  recommendations      Recommendation[] // 1-to-many relation
+  user                 User     @relation(fields: [userId], references: [id])
+}
+
+model Recommendation {
+  id           String   @id @default(uuid())
+  title        String
+  reason       String   // why it was recommended (optional)
+  userContext  UserContext @relation(fields: [userContextId], references: [id])
+  userContextId String
+  createdAt    DateTime @default(now())
 }

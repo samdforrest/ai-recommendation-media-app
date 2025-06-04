@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
+//import jwt from 'jsonwebtoken';
 
 export async function POST(req: Request) {
   try {
@@ -26,11 +27,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
 
-    // 🔐 (Optional) Set a cookie or JWT here if you want persistent login
+    // 🔐 (Mandatory) Set a cookie or JWT here if you want persistent login
 
     return NextResponse.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email } });
-  } catch (err: any) {
-    console.error('Login error:', err.message);
+  } catch (err: unknown) {
+    console.error('Login error:', err instanceof Error ? err.message : 'Unknown error', err instanceof Error ? err.stack : undefined);
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
   }
+
+  /* Create JWT
+  const token = jwt.sign(
+    { userId: user.id },
+    process.env.JWT_SECRET!,
+    { expiresIn: '7d' }
+  );
+  
+  return NextResponse.json(
+    { message: 'Login success' },
+    {
+      status: 200,
+      headers: {
+        'Set-Cookie': `token=${token}; HttpOnly; Path=/; Max-Age=604800`, // 7 days
+      },
+    }
+  );
+  */
 }

@@ -42,8 +42,10 @@ export async function POST(req: Request) {
 
 
     return NextResponse.json({ message: 'User created', user });
-  } catch (error: any) {
-        console.error("Error in POST /api/users:", error.message, error.stack);
-        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+        console.error("Error in POST /api/users:", error instanceof Error ? error.message : 'Unknown error', error instanceof Error ? error.stack : undefined);
+        return NextResponse.json({ 
+          error: error instanceof Error ? error.message : 'Internal Server Error' 
+        }, { status: 500 });
   }
 }

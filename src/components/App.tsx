@@ -64,9 +64,9 @@ const App = () => {
         setMovies(data.movies || []);
         setShows(data.shows || []);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching recommendations:', err);
-      const errorMessage = err.message || 'Something went wrong';
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
       alert(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
