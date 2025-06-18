@@ -96,19 +96,34 @@ const App = () => {
               </button>
             </>
           ) : (
-            <button
-              onClick={() => window.location.href = '/login'}
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: '#0070f3',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-            >
-              Login
-            </button>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button
+                onClick={() => window.location.href = '/login'}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#0070f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => window.location.href = '/signup'}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Sign Up
+              </button>
+            </div>
           )}
         </div>
       </div>
