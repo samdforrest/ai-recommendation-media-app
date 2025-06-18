@@ -1,8 +1,8 @@
 'use client';
 
 import './App.css';
-import { useState, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Recommendation {
   title: string;
@@ -11,20 +11,34 @@ interface Recommendation {
 }
 
 const App = () => {
+  const router = useRouter();
+
   const [prompt, setPrompt] = useState('');
   const [movies, setMovies] = useState<Recommendation[]>([]);
   const [shows, setShows] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const searchParams = useSearchParams();
-  const userName = searchParams.get('name');
-  const userEmail = searchParams.get('email');
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Fetch user context from cookie token
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        if (data.user) {
+          setUser({ name: data.user.name, email: data.user.email });
+        }
+      } catch (err) {
+        console.error('Failed to fetch user context:', err);
+      }
+    };
+    getUser();
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
-
     const el = textareaRef.current;
     if (el) {
       el.style.height = 'auto';
@@ -45,18 +59,14 @@ const App = () => {
       });
 
       const text = await response.text();
-      console.log('Raw response text:', text);
-
       let data;
       try {
         data = JSON.parse(text);
       } catch (err) {
         console.error('Invalid JSON from server:', err);
-        alert('The server returned invalid JSON. Check console for details.');
+        alert('The server returned invalid JSON.');
         return;
       }
-
-      console.log('Parsed API response:', data);
 
       if (data.raw && (!data.movies?.length && !data.shows?.length)) {
         alert(data.raw);
@@ -66,23 +76,29 @@ const App = () => {
       }
     } catch (err: unknown) {
       console.error('Error fetching recommendations:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
-      alert(`Error: ${errorMessage}`);
+      alert(`Error: ${err instanceof Error ? err.message : 'Something went wrong'}`);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleLogout = async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    setUser(null);
+    router.push('/');
+  };
+
 
   return (
     <div className="app-container">
       {/* Top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {userName ? (
+          {user ? (
             <>
-              <span>Logged in as {userName}</span>
+              <span>Logged in as {user.name}</span>
               <button
-                onClick={() => window.location.href = '/'}
+                onClick={handleLogout}
                 style={{
                   padding: '0.4rem 0.8rem',
                   backgroundColor: '#e63946',
@@ -98,7 +114,7 @@ const App = () => {
           ) : (
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button
-                onClick={() => window.location.href = '/login'}
+                onClick={() => router.push('/login')}
                 style={{
                   padding: '0.5rem 1rem',
                   backgroundColor: '#0070f3',
@@ -111,7 +127,7 @@ const App = () => {
                 Login
               </button>
               <button
-                onClick={() => window.location.href = '/signup'}
+                onClick={() => router.push('/signup')}
                 style={{
                   padding: '0.5rem 1rem',
                   backgroundColor: '#4CAF50',
@@ -128,11 +144,10 @@ const App = () => {
         </div>
       </div>
 
-      {/* Welcome message */}
-      {userName && userEmail && (
+      {user && (
         <div className="user-info" style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          <h2>Welcome, {userName}!</h2>
-          <p style={{ color: '#555' }}>{userEmail}</p>
+          <h2>Welcome, {user.name}!</h2>
+          <p style={{ color: '#555' }}>{user.email}</p>
         </div>
       )}
 

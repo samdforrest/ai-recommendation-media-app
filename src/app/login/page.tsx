@@ -26,8 +26,7 @@ export default function LoginPage() {
 
     if (res.ok) {
       // ✅ Redirect to home or dashboard
-      const { name, email } = data.user;
-      router.push(`/?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`);
+      router.push(`/`);
     } else {
       setError(data.error || 'Login failed');
     }
