@@ -5,9 +5,11 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Recommendation {
+  id: string;
   title: string;
   year: string | number;
   description: string;
+  isLiked?: boolean;
 }
 
 const App = () => {
@@ -88,6 +90,44 @@ const App = () => {
     router.push('/');
   };
 
+  const handleLike = async (recommendation: Recommendation, type: 'movie' | 'show') => {
+    if (!user) {
+      console.log('❌ Like attempted without login, redirecting to login page');
+      router.push('/login');
+      return;
+    }
+
+    console.log(`👍 Attempting to like ${type}:`, recommendation);
+
+    try {
+      const response = await fetch('/api/recommendations/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recommendationId: recommendation.id }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Like operation successful:', data);
+        
+        // Update local state
+        if (type === 'movie') {
+          setMovies(movies.map(m => 
+            m.id === recommendation.id ? { ...m, isLiked: !m.isLiked } : m
+          ));
+        } else {
+          setShows(shows.map(s => 
+            s.id === recommendation.id ? { ...s, isLiked: !s.isLiked } : s
+          ));
+        }
+      } else {
+        const error = await response.json();
+        console.error('❌ Like operation failed:', error);
+      }
+    } catch (error) {
+      console.error('❌ Error liking recommendation:', error);
+    }
+  };
 
   return (
     <div className="app-container">
@@ -186,9 +226,24 @@ const App = () => {
             <h2>Movies</h2>
             <ul>
               {movies.map((rec, index) => (
-                <li key={index}>
-                  <strong>{rec.title}</strong> ({rec.year})<br />
-                  <em>{rec.description}</em>
+                <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                  <div>
+                    <strong>{rec.title}</strong> ({rec.year})<br />
+                    <em>{rec.description}</em>
+                  </div>
+                  <button
+                    onClick={() => handleLike(rec, 'movie')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '1.5rem',
+                      padding: '0.25rem',
+                      color: rec.isLiked ? '#e63946' : '#999',
+                    }}
+                  >
+                    ♥
+                  </button>
                 </li>
               ))}
             </ul>
@@ -200,9 +255,24 @@ const App = () => {
             <h2>TV Series</h2>
             <ul>
               {shows.map((rec, index) => (
-                <li key={index}>
-                  <strong>{rec.title}</strong> ({rec.year})<br />
-                  <em>{rec.description}</em>
+                <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                  <div>
+                    <strong>{rec.title}</strong> ({rec.year})<br />
+                    <em>{rec.description}</em>
+                  </div>
+                  <button
+                    onClick={() => handleLike(rec, 'show')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '1.5rem',
+                      padding: '0.25rem',
+                      color: rec.isLiked ? '#e63946' : '#999',
+                    }}
+                  >
+                    ♥
+                  </button>
                 </li>
               ))}
             </ul>

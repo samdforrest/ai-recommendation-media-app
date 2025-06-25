@@ -13,25 +13,25 @@ model User {
   email        String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
-
-  context UserContext? // 👈 Back-reference
+  context      UserContext?
 }
 
 model UserContext {
   id                   String   @id @default(uuid())
   userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id])
   preferredGenres      String[]
   recentSearches       String[]
   likedRecommendations String[]
-  recommendations      Recommendation[] // 1-to-many relation
-  user                 User     @relation(fields: [userId], references: [id])
+  recommendations      Recommendation[]
 }
 
 model Recommendation {
-  id           String   @id @default(uuid())
-  title        String
-  reason       String   // why it was recommended (optional)
-  userContext  UserContext @relation(fields: [userContextId], references: [id])
+  id            String      @id @default(uuid())
+  title         String
+  year          String
+  description   String
+  userContext   UserContext @relation(fields: [userContextId], references: [id])
   userContextId String
-  createdAt    DateTime @default(now())
+  createdAt     DateTime    @default(now())
 }

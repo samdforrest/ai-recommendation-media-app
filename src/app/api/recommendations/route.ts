@@ -107,11 +107,14 @@ export async function POST(req: NextRequest) {
         .map(line => {
           const match = line.match(/^(\d+)\.\s+\*\*([^\*]+)\*\*\s+\(([^)]+)\):\s+(.+)/);
           if (match) {
-            return {
+            const recommendation = {
+              id: `${match[2].trim()}-${match[3]}-${Date.now()}`.replace(/[^a-zA-Z0-9-]/g, '-'),
               title: match[2].trim(),
               year: match[3],
               description: match[4].trim()
             };
+            console.log('📝 Generated recommendation:', recommendation);
+            return recommendation;
           }
           return null;
         })
