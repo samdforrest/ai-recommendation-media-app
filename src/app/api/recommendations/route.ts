@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
 import { Recommendation } from '../../../types';
+import { prisma } from '@/lib/prisma';
+import jwt from 'jsonwebtoken';
+import { UserContext } from '@prisma/client';
 //import { prisma } from '@/lib/prisma';
 //import jwt from 'jsonwebtoken';
 
@@ -11,10 +14,16 @@ const openai = new OpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
 });
 
-const systemPrompt = `You are a helpful assistant that recommends movies or shows based on the user's description.
+function getSystemPrompt(userContext: UserContext | null) {
+  return `You are a helpful assistant that recommends movies or shows based on the user's description.
 Always respond with two sections: "Movies" and "TV Series". 
 Each section should be a numbered list in this format:
 1. **Title** (Year): Description
+
+When generating recommendations:
+1. Consider their preferred genres: ${userContext?.preferredGenres?.join(', ') || 'No preferences yet'}
+2. Here's content that they've already liked, you should avoid recommending it, but take inspiration from it: ${userContext?.likedRecommendations?.join(', ') || 'None yet'}
+3. Take inspiration from their recent searches: ${userContext?.recentSearches?.join(', ') || 'No recent searches'}
 
 For example:
 Movies:
@@ -34,27 +43,26 @@ If it's a TV series that has a singular year / season (e.g. 2008), you should fo
 If it's defined as an OVA (Original Video Animation), you should format it as if it was a television show with a single season and year (e.g. 2008-2008).
 
 Another clause for OVAs is that they are usually anime, so whenever anybody asks for an anime, you should consider if the media is an OVA or not.`;
-
+}
 
 export async function POST(req: NextRequest) {
-  /* jwt attempt
   const token = req.cookies.get('token')?.value;
 
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized - no token' }, { status: 401 });
   }
 
-  let userId: string;
+  let userContext = null;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-    userId = decoded.userId;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+    userContext = await prisma.userContext.findUnique({
+      where: { userId: decoded.id }
+    });
   } catch (error) {
     console.error('Invalid token:', error);
     return NextResponse.json({ error: 'Unauthorized - invalid token' }, { status: 403 });
   }
 
-  console.log('User ID:', userId);
-  end of jwt attempt */
   const body = await req.json();
   const { prompt } = body;
 
@@ -63,10 +71,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const systemPromptContent = getSystemPrompt(userContext);
+    console.log('🤖 System Prompt:', systemPromptContent);
+    console.log('👤 User Prompt:', prompt);
+
     const chatResponse = await openai.chat.completions.create({
       model: 'llama3-8b-8192',
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: systemPromptContent },
         { role: 'user', content: prompt },
       ],
     });
